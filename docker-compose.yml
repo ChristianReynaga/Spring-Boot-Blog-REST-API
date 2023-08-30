@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  db:
+    image: mysql
+    container_name: blogapi-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'blogdb'
+      MYSQL_USER: 'admin'
+      MYSQL_PASSWORD: 'admin'
+      MYSQL_ROOT_PASSWORD: 'secret'
+    ports:
+      - '3307:3306'
+    networks:
+      - blogapi-network
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
+  backend:
+    container_name: blogapi-app
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - blogapi-network
+    depends_on:
+      - "db"
+networks:
+  blogapi-network:
+    name: blogapi-network
+    driver: bridge
